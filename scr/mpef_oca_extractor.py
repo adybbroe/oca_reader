@@ -175,13 +175,17 @@ class FileListener(threading.Thread):
         if not msg:
             return False
 
-        urlobj = urlparse(msg.data['uri'])
-        server = urlobj.netloc
-        url_ip = socket.gethostbyname(urlobj.netloc)
-        if urlobj.netloc and (url_ip not in get_local_ips()):
-            LOG.warning("Server %s not the current one: %s",
-                        str(server),
-                        socket.gethostname())
+        # urlobj = urlparse(msg.data['uri'])
+        # server = urlobj.netloc
+        # url_ip = socket.gethostbyname(urlobj.netloc)
+        # if urlobj.netloc and (url_ip not in get_local_ips()):
+        #     LOG.warning("Server %s not the current one: %s",
+        #                 str(server),
+        #                 socket.gethostname())
+        #     return False
+
+        if msg.type != 'dataset':
+            LOG.debug('Message is not of type dataset')
             return False
 
         if ('platform_name' not in msg.data or
