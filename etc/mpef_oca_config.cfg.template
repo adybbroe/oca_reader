@@ -1,0 +1,17 @@
+[DEFAULT]
+
+posttroll_topic=/2/oca/0deg
+
+
+[offline]
+output_path = /home/a000680/data/oca
+
+[prod]
+output_path = /data/24/saf/geo_out/0deg
+
+[test]
+output_path = /data/prodtest/saf/geo_out/0deg/
+
+[utv]
+output_path = /data/proj/safutv/geo_out/0deg/
+
