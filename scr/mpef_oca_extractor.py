@@ -33,7 +33,8 @@ LOG = logging.getLogger(__name__)
 
 
 PPP_CONFIG_DIR = os.environ.get('PPP_CONFIG_DIR', './')
-LOG.debug("mpop config dir: %s", PPP_CONFIG_DIR)
+LOG.info("mpop config dir: %s", PPP_CONFIG_DIR)
+print("mpop config dir: %s" % PPP_CONFIG_DIR)
 
 CFG_DIR = os.environ.get('MPEF_OCA_CONFIG_DIR', './')
 DIST = os.environ.get("SMHI_DIST", 'elin4')
@@ -44,12 +45,13 @@ else:
 
 CONF = RawConfigParser()
 CFG_FILE = os.path.join(CFG_DIR, "mpef_oca_config.cfg")
-LOG.debug("Config file = " + str(CFG_FILE))
+LOG.info("Config file = " + str(CFG_FILE))
 AREA_DEF_FILE = os.path.join(CFG_DIR, "areas.def")
 if not os.path.exists(CFG_FILE):
     raise IOError('Config file %s does not exist!' % CFG_FILE)
 
-LOG.debug("areas.def file: %s", AREA_DEF_FILE)
+LOG.info("areas.def file: %s", AREA_DEF_FILE)
+print("areas.def file: %s" % AREA_DEF_FILE)
 
 CONF.read(CFG_FILE)
 
