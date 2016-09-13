@@ -281,8 +281,8 @@ def ready2run(msg, files4oca, job_register, sceneid):
         files4oca[sceneid] = []
 
     for item in level1_files:
-        fname = os.path.basename(item)
-        files4oca[sceneid].append(fname)
+        #fname = os.path.basename(item)
+        files4oca[sceneid].append(item)
 
     LOG.debug("files4oca: %s", str(files4oca[sceneid]))
 
@@ -338,9 +338,8 @@ def oca_runner():
         if status:
             jobs_dict[keyname] = datetime.utcnow()
 
-            urlobj = urlparse(msg.data['uri'])
-            path, fname = os.path.split(urlobj.path)
-            LOG.debug("path " + str(path) + " filename = " + str(fname))
+            for fname in files4oca[keyname]:
+                LOG.debug("Filename: %s", fname)
 
             scene = {'platform_name': platform_name,
                      'starttime': start_time,
