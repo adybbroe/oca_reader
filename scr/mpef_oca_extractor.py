@@ -217,7 +217,7 @@ def create_message(resultfile, mda):
     return pub_message
 
 
-def oca_extractor(mda, scene, job_id, publish_q):
+def oca_extractor(mda, scene, job_id, publish_q, area_ids):
     """Read the LRIT encoded Grib files and convert to netCDF
 
     """
@@ -231,18 +231,27 @@ def oca_extractor(mda, scene, job_id, publish_q):
         for lritfile in lrit_files:
             LOG.info("LRIT file = %s", lritfile)
 
-        oca = oca_reader.OCAData()
-        oca.read_from_lrit(lrit_files)
+        for area_id in area_ids:
+            oca = oca_reader.OCAData()
+            oca.read_from_lrit(lrit_files)
 
-        # print("Project...")
-        # this.project('euron1')
-        # print("Projection done...")
+            fname_ext = '%s_%s.png' % (oca.timeslot.strftime('%Y%m%d%H%M'),
+                                       area_id)
 
-        # img = this.make_image('reff')
-        # #img = this.make_image('ul_ctp')
-        # img.add_overlay()
-        # img.show()
-        # #img.save('./ul_ctp_%s.png' % this.timeslot.strftime('%Y%m%d%H%M'))
+            LOG.info("Project...")
+            oca.project(area_id)
+            LOG.info("Projection done...")
+
+            img = oca.make_image('reff')
+            img.add_overlay()
+            product_path = os.path.join(OUTPUT_PATH,
+                                        'ul_ctp_' + fname_ext)
+            img.save(product_path)
+            img = oca.make_image('ul_ctp')
+            img.add_overlay()
+            product_path = os.path.join(OUTPUT_PATH,
+                                        'ul_ctp_' + fname_ext)
+            img.save(product_path)
 
     except:
         LOG.exception('Failed in oca_extractor...')
@@ -290,8 +299,11 @@ def ready2run(msg, files4oca, job_register, sceneid):
     return True
 
 
-def oca_runner():
-    """Listens and triggers processing"""
+def oca_runner(area_ids):
+    """Listens and triggers processing. OCA products are stored on a list of areas
+    specified by *area_ids*
+
+    """
 
     LOG.info(
         "*** Start the extraction and conversion of MPEF OCA level2 profiles")
@@ -354,7 +366,7 @@ def oca_runner():
                              (msg.data, scene,
                               jobs_dict[
                                   keyname],
-                              publisher_q))
+                              publisher_q, area_ids))
 
             # Clean the files4oca dict:
             LOG.debug("files4oca: " + str(files4oca))
@@ -391,4 +403,4 @@ if __name__ == "__main__":
     logging.getLogger('posttroll').setLevel(logging.INFO)
 
     LOG = logging.getLogger('oca_reader')
-    oca_runner()
+    oca_runner(['euron1'])
