@@ -31,6 +31,10 @@ from ConfigParser import RawConfigParser
 import logging
 LOG = logging.getLogger(__name__)
 
+
+PPP_CONFIG_DIR = os.environ.get('PPP_CONFIG_DIR', './')
+LOG.debug("mpop config dir: %s", PPP_CONFIG_DIR)
+
 CFG_DIR = os.environ.get('MPEF_OCA_CONFIG_DIR', './')
 DIST = os.environ.get("SMHI_DIST", 'elin4')
 if not DIST or DIST == 'linda4':
@@ -44,6 +48,8 @@ LOG.debug("Config file = " + str(CFG_FILE))
 AREA_DEF_FILE = os.path.join(CFG_DIR, "areas.def")
 if not os.path.exists(CFG_FILE):
     raise IOError('Config file %s does not exist!' % CFG_FILE)
+
+LOG.debug("areas.def file: %s", AREA_DEF_FILE)
 
 CONF.read(CFG_FILE)
 
