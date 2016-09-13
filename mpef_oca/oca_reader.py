@@ -42,6 +42,12 @@ from mpop.imageo import geo_image
 from mpop.imageo import palettes
 
 
+CFG_DIR = os.environ.get('PPP_CONFIG_DIR', './')
+AREA_DEF_FILE = os.path.join(CFG_DIR, "areas.def")
+if not os.path.exists(AREA_DEF_FILE):
+    raise IOError('Config file %s does not exist!' % AREA_DEF_FILE)
+
+
 LRIT_PATTERN = "L-000-{platform_name:_<5s}_-MPEF________-OCAE_____-{segment:_<9s}-{nominal_time:%Y%m%d%H%M}-{compressed:_<2s}"
 
 from .utils import (SCENE_TYPE_LAYERS, OCA_FIELDS, FIELDNAMES,
@@ -151,9 +157,7 @@ class OCAData(object):
             self._projectables.append(field)
 
         self.timeslot = None
-
-        self.area_def = pr.utils.load_area(
-            '/home/a000680/usr/src/mpop/etc/areas.def', 'met09globeFull')
+        self.area_def = pr.utils.load_area(AREA_DEF_FILE, 'met09globeFull')
 
     def readgrib(self):
         """Read the data"""
