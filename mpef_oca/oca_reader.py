@@ -42,7 +42,7 @@ from mpop.imageo import geo_image
 from mpop.imageo import palettes
 
 
-CFG_DIR = os.environ.get('PPP_CONFIG_DIR', './')
+CFG_DIR = os.environ.get('MPEF_OCA_CONFIG_DIR', './')
 AREA_DEF_FILE = os.path.join(CFG_DIR, "areas.def")
 if not os.path.exists(AREA_DEF_FILE):
     raise IOError('Config file %s does not exist!' % AREA_DEF_FILE)
