@@ -239,8 +239,7 @@ class OCAData(object):
 
         swath_def = pr.geometry.SwathDefinition(lons, lats)
 
-        out_area_def = pr.utils.load_area(
-            '/home/a000680/usr/src/mpop/etc/areas.def', areaid)
+        out_area_def = pr.utils.load_area(AREA_DEF_FILE, areaid)
 
         for item in self._projectables:
             data = getattr(getattr(self, item), 'data')
