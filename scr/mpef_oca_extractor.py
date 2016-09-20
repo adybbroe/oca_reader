@@ -230,32 +230,42 @@ def oca_extractor(mda, scene, job_id, publish_q, area_ids):
 
     """
 
-    from mpef_oca import oca_reader
+    from mpop.satellites import GeostationaryFactory
+    from datetime import datetime
+    from mpop.utils import debug_on
+    debug_on()
 
     try:
-        LOG.debug("OCA data reader: Start...")
+        LOG.debug("Load and project OCA data: Start...")
 
         lrit_files = scene['filenames']
         for lritfile in lrit_files:
             LOG.info("LRIT file = %s", lritfile)
 
-        for area_id in area_ids:
-            oca = oca_reader.OCAData()
-            oca.read_from_lrit(lrit_files)
+        param = 'reff'
+        #param = 'scenetype'
+        glbd = GeostationaryFactory.create_scene(scene['platform_name'],
+                                                 "", scene['sensor'],
+                                                 scene['starttime'],
+                                                 area='met09globeFull')
+        glbd.load(['OCA'], filenames=lrit_files)
 
-            fname_ext = '%s_%s.png' % (oca.timeslot.strftime('%Y%m%d%H%M'),
+        for area_id in area_ids:
+
+            fname_ext = '%s_%s.png' % (scene['starttime'].strftime('%Y%m%d%H%M'),
                                        area_id)
 
             LOG.info("Project...")
-            oca.project(area_id)
+            lcd = glbd.project(area_id)
             LOG.info("Projection done...")
 
-            img = oca.make_image('reff')
+            img = lcd.image.oca('reff')
             img.add_overlay()
             product_path = os.path.join(OUTPUT_PATH,
-                                        'ul_ctp_' + fname_ext)
+                                        'reff_' + fname_ext)
             img.save(product_path)
-            img = oca.make_image('ul_ctp')
+
+            img = lcd.image.oca('ul_ctp')
             img.add_overlay()
             product_path = os.path.join(OUTPUT_PATH,
                                         'ul_ctp_' + fname_ext)
