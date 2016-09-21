@@ -95,6 +95,11 @@ SATELLITE = {'MSG3': 'Meteosat-10',
 SUPPORTED_SATELLITES = ['Meteosat-08', 'Meteosat-09',
                         'Meteosat-10', 'Meteosat-11']
 
+SAT_FILE_PREFIX = {'Meteosat-10': 'met10',
+                   'Meteosat-09': 'met09',
+                   'Meteosat-08': 'met08',
+                   'Meteosat-11': 'met11'}
+
 
 def get_local_ips():
     inet_addrs = [netifaces.ifaddresses(iface).get(netifaces.AF_INET)
@@ -231,9 +236,8 @@ def oca_extractor(mda, scene, job_id, publish_q, area_ids):
     """
 
     from mpop.satellites import GeostationaryFactory
-    from datetime import datetime
-    from mpop.utils import debug_on
-    debug_on()
+    #from mpop.utils import debug_on
+    # debug_on()
 
     try:
         LOG.debug("Load and project OCA data: Start...")
@@ -242,8 +246,6 @@ def oca_extractor(mda, scene, job_id, publish_q, area_ids):
         for lritfile in lrit_files:
             LOG.info("LRIT file = %s", lritfile)
 
-        param = 'reff'
-        #param = 'scenetype'
         glbd = GeostationaryFactory.create_scene(scene['platform_name'],
                                                  "", scene['sensor'],
                                                  scene['starttime'],
@@ -252,24 +254,25 @@ def oca_extractor(mda, scene, job_id, publish_q, area_ids):
 
         for area_id in area_ids:
 
-            fname_ext = '%s_%s.png' % (scene['starttime'].strftime('%Y%m%d%H%M'),
-                                       area_id)
+            fname_prfx = '%s_%s_%s_oca' % (SAT_FILE_PREFIX.get(scene['platform_name'],
+                                                               scene['platform_name'].lower()),
+                                           scene['starttime'].strftime(
+                                               '%Y%m%d%H%M'),
+                                           area_id)
 
             LOG.info("Project...")
             lcd = glbd.project(area_id)
             LOG.info("Projection done...")
 
-            img = lcd.image.oca('reff')
-            img.add_overlay()
-            product_path = os.path.join(OUTPUT_PATH,
-                                        'reff_' + fname_ext)
-            img.save(product_path)
+            lcd.save(os.path.join(OUTPUT_PATH, fname_prfx + '.nc'))
 
-            img = lcd.image.oca('ul_ctp')
-            img.add_overlay()
-            product_path = os.path.join(OUTPUT_PATH,
-                                        'ul_ctp_' + fname_ext)
-            img.save(product_path)
+            for field in ['scenetype', 'reff',
+                          'ul_ctp', 'ul_cot', 'll_ctp', 'll_cot', 'cost']:
+                img = lcd.image.oca(field)
+                img.add_overlay()
+                product_path = os.path.join(
+                    OUTPUT_PATH, fname_prfx + '_' + field)
+                img.save(product_path + '.tif')
 
     except:
         LOG.exception('Failed in oca_extractor...')
