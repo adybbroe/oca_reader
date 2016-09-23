@@ -424,4 +424,4 @@ if __name__ == "__main__":
     logging.getLogger('posttroll').setLevel(logging.INFO)
 
     LOG = logging.getLogger('oca_reader')
-    oca_runner(['euron1'])
+    oca_runner(['eurol'])
